@@ -83,11 +83,11 @@ Module MyList.
 
   Theorem rev_is_rev_tail :
     forall A (xs : list A),
-      rev xs = rev_tail xs.
+      rev_tail xs = rev xs.
   Proof.
     induction xs.
     - simpl. unfold rev_tail. simpl. reflexivity.
-    - simpl. unfold rev_tail. simpl. rewrite IHxs. (* ??? *)
+    - simpl. unfold rev_tail. simpl. (* ? *) rewrite <- IHxs. (* ??? *)
   Abort.
 
   (* Rule of thumb: if a function is a fixpoint, statements about it should be
@@ -174,9 +174,9 @@ Module MyList.
       reflexivity.
   Qed.
 
-  Theorem rev_is_rev_tail :
+  Theorem rev_tail_is_rev :
     forall A (xs : list A),
-      rev xs = rev_tail xs.
+      rev_tail xs = rev xs.
   Proof.
     unfold rev_tail.
     intros.
