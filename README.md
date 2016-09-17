@@ -3,7 +3,9 @@
 Educational materials for practical use of proof assistants to get things done.
 
 Part 1: Gallina programming
+
 Part 2: Imp programming
+
 Part 3: "ML" programming
 
 Points of emphasis:
