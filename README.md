@@ -21,3 +21,14 @@ Points of emphasis:
   * from gallina
   * from deeply embedded DSL
   * design and implementation of trusted shims
+
+
+## Build Instructions
+
+```
+./configure
+make
+```
+
+The `./configure` script will generate a `_CoqProject` file that can be used by
+Proof General, CoqIDE, and as input to the Makefile.
