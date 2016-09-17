@@ -16,6 +16,9 @@ Module MyBool. (* Use a module so that we don't clobber stdlib. *)
   Print negb'.
   Unset Printing All.
 
+  (* TODO: talk about definitional equalities here with examples using
+    `Eval compute`. *)
+
   Lemma negb_negb_id : forall x : bool, negb (negb x) = x.
   (* Detailed paper proof:
      By case analysis on x.
