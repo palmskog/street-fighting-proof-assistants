@@ -3,5 +3,7 @@
 *.glob
 .*.aux
 lia.cache
+_CoqProject
+Makefile.coq
 
 _build/
