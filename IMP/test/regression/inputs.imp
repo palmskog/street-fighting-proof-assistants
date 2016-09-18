@@ -1,0 +1,12 @@
+i1 = input_int();
+i2 = input_int();
+b1 = input_bool();
+b2 = input_bool();
+
+if(b1 and b2) {
+  result = i1;
+} else {
+  result = i2;
+}
+
+return result;

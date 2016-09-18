@@ -1,0 +1,7 @@
+*.vo
+*.v.d
+*.glob
+.*.aux
+lia.cache
+
+_build/

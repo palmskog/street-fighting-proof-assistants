@@ -1,0 +1,8 @@
+_CoqProject
+Makefile.coq
+Imp.native
+Imp.d.byte
+
+test/regression/*.imp.input
+test/regression/*.imp.result
+test/parser_pretty/*.imp
