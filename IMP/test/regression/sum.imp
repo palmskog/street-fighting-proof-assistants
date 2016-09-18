@@ -1,3 +1,14 @@
+def sum(a) {
+  i = 0;
+  result = 0;
+  while (i < len(a)) {
+    result = result + a[i];
+    i = i + 1;
+  }
+  
+  return result;
+}
+
 n = input_int();
 
 if(n < 0) {
@@ -11,11 +22,6 @@ while(i < n) {
   i = i + 1;
 }
 
-i = 0;
-result = 0;
-while (i < len(a)) {
-  result = result + a[i];
-  i = i + 1;
-}
+result = sum(a);
 
 return result;
