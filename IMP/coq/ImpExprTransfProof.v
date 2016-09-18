@@ -300,7 +300,7 @@ Proof.
     repeat find_inversion.
     repeat find_apply_lem_hyp transfs_e_bwd.
     on (or _ _), invc; [left |right].
-    + destruct x0; simpl in *.
+    + destruct f0; simpl in *.
       repeat find_inversion. repeat ee.
     + unfold not in *; intros.
       split; [congruence | intros].
@@ -515,7 +515,7 @@ Proof.
   find_eapply_lem_hyp transfs_s_bwd; eauto.
   on (or _ _), invc.
   - break_exists; break_and.
-    destruct x; simpl in *; try discriminate.
+    destruct p; simpl in *; try discriminate.
     find_apply_lem_hyp transf_bwd.
     on (or _ _), invc.
     + left; ee.

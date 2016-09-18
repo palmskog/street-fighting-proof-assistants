@@ -67,7 +67,9 @@ Ltac break_inner_match := break_inner_match_goal || break_inner_match_hyp.
 
 Ltac break_exists :=
   repeat match goal with
-           | [H : exists _, _ |- _ ] => destruct H
+           | [H : exists (name : _), _ |- _ ] =>
+             let x := fresh name in
+             destruct H as [x]
          end.
 
 Ltac break_exists_exists :=
