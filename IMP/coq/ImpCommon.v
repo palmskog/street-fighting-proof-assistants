@@ -20,8 +20,9 @@ Definition val_eq_dec :
     {v1 = v2} + {v1 <> v2}.
 Proof.
   decide equality.
-  - apply Z.eq_dec.
   - apply Bool.bool_dec.
+  - apply Z.eq_dec.
+  - apply String.string_dec.
   - apply Z.eq_dec.
 Defined.
 

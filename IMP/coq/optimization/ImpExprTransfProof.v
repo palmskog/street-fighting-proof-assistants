@@ -46,9 +46,13 @@ Proof.
   - on (eval_e _ _ _ _), invc.
     do 2 find_copy_apply_hyp_hyp. ee.
   - on (eval_e _ _ _ _), invc.
-    find_copy_apply_hyp_hyp. ee.
+    + find_copy_apply_hyp_hyp. ee.
+    + find_copy_apply_hyp_hyp.
+      eapply eval_len_s; eauto.
   - on (eval_e _ _ _ _), invc.
-    find_copy_apply_hyp_hyp. ee.
+    + find_copy_apply_hyp_hyp. ee.
+    + find_copy_apply_hyp_hyp.
+      eapply eval_idx_s; eauto.
 Qed.
 
 Lemma transf_e_bwd :
@@ -91,7 +95,10 @@ Proof.
     on (or _ _), invc; auto.
     + left; ee.
     + right; unfold not in *; intros.
-      on (eval_e _ _ _ _), inv. firstorder.
+      on (eval_e _ _ _ _), inv.
+      * firstorder.
+      * firstorder.
+    + left; eapply eval_len_s; eauto.
   - right; unfold not in *; intros.
     on (eval_e _ _ _ _), inv.
     eapply H0; eauto. ee.

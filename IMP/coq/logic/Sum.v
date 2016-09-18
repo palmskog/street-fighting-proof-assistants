@@ -72,13 +72,14 @@ Proof.
   - (* loop invariant /\ false -> postcondition *)
     break_and. break_exists_name i_val; break_exists_name acc; break_and.
     break_eval_expr.
-    repeat find_rewrite.
-    repeat find_injection.
-    unfold imp_lt, pred_of_dec in *. break_if; try discriminate.
-    assert (i2 = Zlength contents) by congruence. subst.
-    assert (i1 = Zlength contents) by omega. subst.
-    rewrite Zlength_correct, Nat2Z.id, skipn_none in *.
-    auto using f_equal.
+    + repeat find_rewrite.
+      repeat find_injection.
+      unfold imp_lt, pred_of_dec in *. break_if; try discriminate.
+      assert (i2 = Zlength contents) by congruence. subst.
+      assert (i1 = Zlength contents) by omega. subst.
+      rewrite Zlength_correct, Nat2Z.id, skipn_none in *.
+      auto using f_equal.
+    + congruence.
   - (* precondition -> loop invariant *)
     split; auto.
     exists 0, 0.
@@ -92,7 +93,8 @@ Proof.
     end.
     intros.
     break_and. subst.
-    repeat (step_forward; break_eval_expr).
+    repeat (step_forward; break_eval_expr;
+      try congruence).
     split; auto.
     break_exists_name i_val. break_exists_name acc. break_and.
     rewrite !lkup_update_neq in * by discriminate.
@@ -115,4 +117,12 @@ Proof.
       find_eapply_lem_hyp  array_at_read_nth_error; eauto.
       erewrite skipn_nth_error_unroll in * by eauto.
       cbn [sum_Zlist] in *. auto.
-Qed.
+
+  (* leftover from string stuff *)
+  + find_inversion.
+  find_inversion.
+  unfold array_at in Harr.
+  repeat find_rewrite.
+  break_and.
+  (* FALSE by H17 *)
+Admitted.

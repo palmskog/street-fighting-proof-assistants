@@ -2,8 +2,9 @@ Require Import String.
 Require Import ZArith.
 
 Inductive val : Type :=
-| Vint : Z -> val
 | Vbool : bool -> val
+| Vint  : Z -> val
+| Vstr  : string -> val
 | Vaddr : Z -> val.
 
 Inductive op1 : Type :=

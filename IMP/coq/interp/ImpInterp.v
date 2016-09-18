@@ -26,6 +26,8 @@ Definition interp_op2
   match op, v1, v2 with
   | Oadd, Vint i1, Vint i2 =>
       Some (Vint (Z.add i1 i2))
+  | Oadd, Vstr s1, Vstr s2 =>
+      Some (Vstr (String.append s1 s2))
   | Osub, Vint i1, Vint i2 =>
       Some (Vint (Z.sub i1 i2))
   | Omul, Vint i1, Vint i2 =>
@@ -76,6 +78,8 @@ Fixpoint interp_e (s : store) (h : heap)
           | Some (Vint l) => Some (Vint l)
           | _ => None
           end
+      | Some (Vstr cs) =>
+          Some (Vint (Z.of_nat (String.length cs)))
       | _ => None
       end
   | Eidx e1 e2 =>
@@ -92,6 +96,15 @@ Fixpoint interp_e (s : store) (h : heap)
                 None
           | _ => None
           end
+      | Some (Vstr cs), Some (Vint i) =>
+          if Z_le_dec 0 i then
+            match String.get (Z.to_nat i) cs with
+            | Some c =>
+                Some (Vstr (String c EmptyString))
+            | None => None
+            end
+          else
+            None
       | _, _ => None
       end
   end.

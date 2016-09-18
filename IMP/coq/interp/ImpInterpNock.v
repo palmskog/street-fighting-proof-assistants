@@ -26,6 +26,16 @@ Fixpoint updates' (s : store)
   | _, _ => s
   end.
 
+Definition strget' (v : val) (s : string) : val :=
+  match v with
+  | Vint i =>
+      match String.get (Z.to_nat i) s with
+      | Some c => Vstr (String c EmptyString)
+      | None => Vint 0
+      end
+  | _ => Vint 0
+  end.
+
 Definition read' (h : heap) (v : val) : val :=
   match v with
   | Vaddr a =>
@@ -68,6 +78,8 @@ Definition interp_op2
   match op, v1, v2 with
   | Oadd, Vint i1, Vint i2 =>
       Vint (Z.add i1 i2)
+  | Oadd, Vstr s1, Vstr s2 =>
+      Vstr (String.append s1 s2)
   | Osub, Vint i1, Vint i2 =>
       Vint (Z.sub i1 i2)
   | Omul, Vint i1, Vint i2 =>
@@ -108,11 +120,20 @@ Fixpoint interp_e (s : store) (h : heap)
         (interp_e s h e1)
         (interp_e s h e2)
   | Elen e1 =>
-      read' h (interp_e s h e1)
+      match interp_e s h e1 with
+      | Vaddr a => read' h (Vaddr a)
+      | Vstr cs => Vint (Z.of_nat (String.length cs))
+      | _ => Vint 0
+      end
   | Eidx e1 e2 =>
-      read' h (interp_op2 Oadd
-                (interp_e s h e1)
-                (interp_e s h e2))
+      match interp_e s h e1 with
+      | Vaddr a =>
+          read' h (interp_op2
+            Oadd (Vaddr a) (interp_e s h e2))
+      | Vstr cs =>
+          strget' (interp_e s h e2) cs
+      | _ => Vint 0
+      end
   end.
 
 Fixpoint interps_e (s : store) (h : heap)

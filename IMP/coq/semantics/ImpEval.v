@@ -20,10 +20,14 @@ Inductive eval_unop : op1 -> val -> val -> Prop :=
                 (Vbool (negb b)).
 
 Inductive eval_binop : op2 -> val -> val -> val -> Prop :=
-| eval_add :
+| eval_add_i :
     forall i1 i2,
       eval_binop Oadd (Vint i1) (Vint i2)
                  (Vint (Z.add i1 i2))
+| eval_add_s :
+    forall s1 s2,
+      eval_binop Oadd (Vstr s1) (Vstr s2)
+                 (Vstr (String.append s1 s2))
 | eval_sub :
     forall i1 i2,
       eval_binop Osub (Vint i1) (Vint i2)
@@ -83,19 +87,31 @@ Inductive eval_e (s : store) (h : heap) :
       eval_e s h e2 v2 ->
       eval_binop op v1 v2 v' ->
       eval_e s h (Eop2 op e1 e2) v'
-| eval_len :
+| eval_len_a :
     forall e a l,
       eval_e s h e (Vaddr a) ->
       read h a = Some (Vint l) ->
       eval_e s h (Elen e) (Vint l)
-| eval_idx :
+| eval_len_s :
+    forall e cs l,
+      eval_e s h e (Vstr cs) ->
+      Z.of_nat (String.length cs) = l ->
+      eval_e s h (Elen e) (Vint l)
+| eval_idx_a :
     forall e1 e2 a l i v,
       eval_e s h e1 (Vaddr a) ->
       eval_e s h e2 (Vint i) ->
       read h a = Some (Vint l) ->
       0 <= i < l ->
       read h (Zsucc (a + i)) = Some v ->
-      eval_e s h (Eidx e1 e2) v.
+      eval_e s h (Eidx e1 e2) v
+| eval_idx_s :
+    forall e1 e2 cs i c,
+      eval_e s h e1 (Vstr cs) ->
+      eval_e s h e2 (Vint i) ->
+      0 <= i ->
+      String.get (Z.to_nat i) cs = Some c ->
+      eval_e s h (Eidx e1 e2) (Vstr (String c EmptyString)).
 
 Inductive evals_e (s : store) (h : heap) :
   list expr -> list val -> Prop :=
