@@ -35,6 +35,8 @@ let extcall name args h =
         prerr_endline ("extcall: read_int could not parse " ^ s);
         (Vint Big.zero, h)
     end
+  | "read_str", [] ->
+      (Vstr (explode (line ())), h)
   | f, _ -> begin
       prerr_endline ("extcall: bogus call to " ^ f);
       (Vint Big.zero, h)

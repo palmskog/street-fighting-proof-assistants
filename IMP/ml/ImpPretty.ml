@@ -6,7 +6,7 @@ let val_pretty = function
   | Vbool true -> "True"
   | Vbool false -> "False"
   | Vint i -> Big.to_string i
-  | Vstr s -> mkstr "\"%s\"" (implode s)
+  | Vstr s -> mkstr "\"%s\"" (String.escaped (implode s))
   | Vaddr a -> mkstr "(Vaddr %s)" (Big.to_string a)
 
 let op1_pretty = function

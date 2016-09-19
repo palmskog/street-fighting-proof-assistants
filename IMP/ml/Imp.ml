@@ -90,10 +90,24 @@ let parse_args () =
       |> loop
   end
 
+let parse' lexbuf =
+  try ImpParser.file ImpLexer.token lexbuf with
+  | ImpLexer.SyntaxError msg ->
+      Printf.fprintf stderr "%a: %s\n"
+        ImpLexer.print_lexpos lexbuf msg;
+      exit 1
+  | ImpParser.Error ->
+      Printf.fprintf stderr "%a: syntax error\n"
+        ImpLexer.print_lexpos lexbuf;
+      exit 1
+
 let parse path =
-  path |> ZUtil.file_str
-       |> Lexing.from_string
-       |> ImpParser.file ImpLexer.token
+  let ic = open_in path in
+  let lexbuf = Lexing.from_channel ic in
+  ImpLexer.set_fname lexbuf path;
+  let p = parse' lexbuf in
+  close_in ic;
+  p
 
 let interp p =
   let interp =

@@ -18,6 +18,9 @@ let rand_big n =
   else
     Big.opp (Big.of_string s)
 
+let rand_char () =
+  Char.chr (32 + Random.int (127 - 32))
+
 let rand_list gen arg n =
   n |> Random.int
     |> range
@@ -29,9 +32,10 @@ let rand_var () =
   ]
 
 let rand_val () =
-  match Random.int 2 with
-  | 0 -> Vint (rand_big 9)
+  match Random.int 3 with
+  | 0 -> Vint (rand_big 20)
   | 1 -> Vbool (Random.bool ())
+  | 2 -> Vstr (rand_list rand_char () 50)
   | _ -> failwith "rand_val"
 
 let rand_op1 () =

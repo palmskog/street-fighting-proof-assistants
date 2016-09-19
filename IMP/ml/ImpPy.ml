@@ -91,6 +91,9 @@ let implib_py = String.concat "\n"
   ; "  except:"
   ; "    return 0"
   ; ""
+  ; "def read_str():"
+  ; "  return sys.stdin.readline().rstrip()"
+  ; ""
   ; ""
   ]
 

@@ -74,6 +74,3 @@ let big_range n =
       loop (Big.sub i Big.one) (i :: acc)
   in
     loop (Big.sub n Big.one) []
-
-(* for lexer / parser errors *)
-let line = ref 1
