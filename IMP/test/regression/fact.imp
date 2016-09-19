@@ -5,7 +5,7 @@ def abs(x) {
   return x;
 }
 
-n = input_int();
+n = read_int();
 n = abs(n);
 result = 1;
 

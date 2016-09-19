@@ -88,7 +88,13 @@ let rec stmt_pretty' = function
   | Sseq (p1, p2) ->
       stmt_pretty' p1 @ stmt_pretty' p2
   | Sincall (p, ret, x, sr) ->
-      failwith "ImpPretty.stmt_py' Sincall"
+      "(Sincall {"
+        :: indent (stmt_pretty' p)
+      @ "}"
+      :: expr_pretty ret
+      :: implode x
+      :: "STACKFRAME)"
+      :: []
 
 let stmt_pretty s =
   String.concat "\n" (stmt_pretty' s)

@@ -45,10 +45,16 @@ function rand_int {
 
 function get_input {
   case $1 in
+    "fact-rec.imp")
+      echo $(rand_int)
+      ;;
     "fact.imp")
       echo $(rand_int)
       ;;
     "fib.imp")
+      echo $(rand_int)
+      ;;
+    "fib-rec.imp")
       echo $(rand_int)
       ;;
     "inputs.imp")

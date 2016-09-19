@@ -1,7 +1,7 @@
-i1 = input_int();
-i2 = input_int();
-b1 = input_bool();
-b2 = input_bool();
+i1 = read_int();
+i2 = read_int();
+b1 = read_bool();
+b2 = read_bool();
 
 if(b1 and b2) {
   result = i1;

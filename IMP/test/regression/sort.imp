@@ -1,4 +1,4 @@
-n = input_int();
+n = read_int();
 
 if(n < 0) {
   n = -n;
