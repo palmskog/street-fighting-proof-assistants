@@ -1,0 +1,19 @@
+def fib(n) {
+  if(1 < n) {
+    x = fib(n - 2);
+    y = fib(n - 1);
+    res = x + y;
+  } else {
+    if(n == 1) {
+      res = 1;
+    } else {
+      res = 0;
+    }
+  }
+  return res;
+}
+
+n = read_int();
+res = fib(n);
+
+return res;

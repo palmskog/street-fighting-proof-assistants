@@ -36,5 +36,6 @@ clean-test:
 	rm -f test/bounded/TESTIMP.*
 
 cleaner: clean clean-test
+	rm -f _CoqProject
 
 .PHONY: proof test clean-coq clean-ml clean clean-test cleaner

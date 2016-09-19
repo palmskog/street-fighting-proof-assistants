@@ -18,15 +18,23 @@ Require Import ImpVerif.
 
 Import ListNotations.
 
-Definition sum :=
-(Sseq
-(Sset "i" (Eval (Vint 0)))
-(Sseq
-(Sset "result" (Eval (Vint 0)))
-(Swhile (Eop2 Olt (Evar "i") (Elen (Evar "a")))
+Definition sum_body :=
   (Sseq
-  (Sset "result" (Eop2 Oadd (Evar "result") (Eidx (Evar "a") (Evar "i"))))
-  (Sset "i" (Eop2 Oadd (Evar "i") (Eval (Vint 1)))))))).
+  (Sset "i" (Eval (Vint 0)))
+  (Sseq
+  (Sset "result" (Eval (Vint 0)))
+  (Swhile (Eop2 Olt (Evar "i") (Elen (Evar "a")))
+    (Sseq
+    (Sset "result" (Eop2 Oadd (Evar "result") (Eidx (Evar "a") (Evar "i"))))
+    (Sset "i" (Eop2 Oadd (Evar "i") (Eval (Vint 1)))))))).
+
+Definition sum_ret :=
+  (Evar "result").
+
+Definition sum_func :=
+  (Func "sum" ("a" :: nil)
+      sum_body
+      sum_ret).
 
 (* Carefully designed to match control flow of loop body above. *)
 Fixpoint sum_Zlist (acc : Z) (l : list Z) : Z :=
@@ -53,11 +61,11 @@ Lemma sum_spec :
   forall env s h s' h' a_val contents,
     lkup s "a" = Some (Vaddr a_val) ->
     array_at a_val contents h ->
-    eval_s env s h sum s' h' ->
+    eval_s env s h sum_body s' h' ->
     lkup s' "result" = Some (Vint (sum_Zlist 0 contents)).
 Proof.
   intros env s h s' h' a_val contents Ha Harr Heval.
-  unfold sum in *.
+  unfold sum_body in *.
   repeat (step_forward; break_eval_expr).
   pose proof (array_at_read_length _ _ _ Harr).
   eapply eval_stmt_while_elim

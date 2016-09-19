@@ -17,6 +17,7 @@ let extcall name args h =
   match implode name, args with
   | "print_val", [v] ->
       print_endline (!val_pretty h v);
+      flush stdout;
       (Vint Big.zero, h)
   | "read_bool", [] ->
       begin match line () with

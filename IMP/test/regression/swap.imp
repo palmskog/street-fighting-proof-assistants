@@ -1,5 +1,5 @@
-x = input_int();
-y = input_int();
+x = read_int();
+y = read_int();
 
 a = alloc(2, 0);
 a[0] = x;

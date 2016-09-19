@@ -492,14 +492,14 @@ Proof.
     + assert (kmatch p1 p1 Kstop) by ee.
       find_apply_hyp_hyp.
       break_exists; break_and.
-      exists x. exists (kapp x0 (Kseq p2 Kstop)).
+      exists pB. exists (kapp kB (Kseq p2 Kstop)).
       split; [|ee]. ee. ee.
       rewrite kapp_kstop_l at 1.
       find_apply_lem_hyp kstep_plus_star.
       apply kstep_star_kapp; auto.
     + find_apply_hyp_hyp.
       break_exists; break_and.
-      exists x. exists (kapp x0 (Kseq p2 Kstop)).
+      exists pB. exists (kapp kB (Kseq p2 Kstop)).
       split; [|ee].
       apply kstep_plus_kapp; auto.
   - inv_kmatch.
@@ -510,14 +510,14 @@ Proof.
     + assert (kmatch p p Kstop) by ee.
       find_apply_hyp_hyp.
       break_exists; break_and.
-      exists x. exists (kapp x0 (Kcall e lr sr Kstop)).
+      exists pB. exists (kapp kB (Kcall e lr sr Kstop)).
       split; [|ee]. ee. ee.
       rewrite kapp_kstop_l at 1.
       find_apply_lem_hyp kstep_plus_star.
       apply kstep_star_kapp; auto.
     + find_apply_hyp_hyp.
       break_exists; break_and.
-      exists x. exists (kapp x0 (Kcall e lr sr Kstop)).
+      exists pB. exists (kapp kB (Kcall e lr sr Kstop)).
       split; [|ee].
       apply kstep_plus_kapp; auto.
 Qed.
@@ -541,7 +541,7 @@ Proof.
     break_exists; break_and.
     find_apply_hyp_hyp; eauto.
     break_exists; break_and.
-    exists x1; exists x2; split; auto.
+    exists pB0; exists kB0; split; auto.
     invc_kstep_plus.
     eapply kstep_star_l; eauto.
     eapply kstep_star_app; eauto.
