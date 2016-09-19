@@ -46,11 +46,18 @@ function iloop {
   done
 }
 
+function sloop {
+  for x in "\"\"" "a" "ab" "abc"; do
+    $@ "$x"
+  done
+}
+
 pushd "$TDIR" > /dev/null
 bloop go not.imp
 iloop go neg.imp
 
 iloop iloop go add.imp
+sloop sloop go sadd.imp
 iloop iloop go sub.imp
 iloop iloop go mul.imp
 iloop iloop go div.imp

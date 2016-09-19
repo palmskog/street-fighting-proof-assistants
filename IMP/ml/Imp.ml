@@ -3,7 +3,7 @@ open ImpSyntax
 open ImpCommon
 
 let _ = begin
-  ImpLib.val_pretty := begin
+  ImpLib.pretty := begin
     fun h v -> ImpPretty.result_pretty (Done (h, v))
   end;
   Random.self_init ()

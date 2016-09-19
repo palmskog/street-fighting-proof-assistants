@@ -109,7 +109,7 @@ let run_py p =
   close_out toc;
   (* run imp prog in python, get results *)
   let (ic, oc, ec) = Unix.open_process_full ("python " ^ tmp) [||] in
-  !ImpLib.lines
+  !ImpLib.inputs
     |> List.rev
     |> String.concat "\n"
     |> output_string oc;
@@ -133,7 +133,16 @@ let result_pretty (res, err, ret) =
 let results_match ir (res, err, ret) =
   match ret with
   | Unix.WEXITED 0 ->
-      ImpPretty.result_pretty ir = res
+      let ir_str =
+        ir |> ImpPretty.result_pretty
+           |> flip List.cons !ImpLib.outputs
+           |> List.rev
+           |> String.concat "\n"
+           (*
+           |> flip (^) "\n"
+           *)
+      in
+      ir_str = res
   | Unix.WEXITED 1 ->
       begin match ir with
       | Stuck _ -> true

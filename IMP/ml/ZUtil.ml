@@ -1,5 +1,7 @@
 let (|>) x f = f x
 
+let flip f a b = f b a
+
 let mkstr = Printf.sprintf
 
 let range n =

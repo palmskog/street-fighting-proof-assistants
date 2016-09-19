@@ -2,25 +2,33 @@ open ImpSyntax
 open ZUtil
 
 (* hack to avoid circular build *)
-let val_pretty : (heap -> coq_val -> string) ref =
+let pretty : (heap -> coq_val -> string) ref =
   ref (fun _ _ -> "")
 
-(* log all input lines so we can replay for testing vs. python *)
-let lines : (string list) ref =
+(* log all I/O for testing vs. python *)
+let inputs : (string list) ref =
   ref []
 
-let line () =
+let input () =
   let s = read_line () in
-  lines := s :: !lines; s
+  inputs := s :: !inputs; s
+
+let outputs : (string list) ref =
+  ref []
+
+let output h v =
+  let s = !pretty h v in
+  outputs := s :: !outputs;
+  print_endline s;
+  flush stdout
 
 let extcall name args h =
   match implode name, args with
   | "print_val", [v] ->
-      print_endline (!val_pretty h v);
-      flush stdout;
+      output h v;
       (Vint Big.zero, h)
   | "read_bool", [] ->
-      begin match line () with
+      begin match input () with
       | "True"  -> (Vbool true, h)
       | "False" -> (Vbool false, h)
       | s -> begin
@@ -29,14 +37,14 @@ let extcall name args h =
         end
       end
   | "read_int", [] -> begin
-      let s = line () in
+      let s = input () in
       try (Vint (Big.of_string s), h)
       with _ ->
         prerr_endline ("extcall: read_int could not parse " ^ s);
         (Vint Big.zero, h)
     end
   | "read_str", [] ->
-      (Vstr (explode (line ())), h)
+      (Vstr (explode (input ())), h)
   | f, _ -> begin
       prerr_endline ("extcall: bogus call to " ^ f);
       (Vint Big.zero, h)

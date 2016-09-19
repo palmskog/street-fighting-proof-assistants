@@ -178,6 +178,7 @@ let result_pretty = function
   | Done (h, v) ->
       begin match v with
       | Vaddr a -> array_pretty h a
+      | Vstr cs -> implode cs
       | v -> val_pretty v
       end
   | _ as r -> result_pretty' r
