@@ -53,14 +53,27 @@ Proof.
     erewrite IHe1; eauto.
     erewrite IHe2; eauto.
     apply nock_op2_ok; auto.
-  - repeat break_match; try discriminate.
+  - break_match_hyp; try discriminate.
     erewrite IHe; eauto.
-    unfold F.read'. repeat find_rewrite; auto.
-  - unfold F.read'.
-    repeat break_match_hyp; try discriminate.
+    break_match_hyp; try discriminate.
+    + find_inversion. auto.
+    + break_match_hyp; try discriminate.
+      break_match_hyp; try discriminate.
+      find_inversion. auto.
+  - break_match_hyp; try discriminate.
     erewrite IHe1; eauto.
-    erewrite IHe2; eauto.
-    simpl. find_rewrite; auto.
+    break_match_hyp; try discriminate.
+    + break_match_hyp; try discriminate.
+      erewrite IHe2; eauto.
+      break_match_hyp; try discriminate.
+      break_match_hyp; try discriminate.
+      unfold F.strget'.
+      break_match_hyp; try discriminate.
+      find_inversion; auto.
+    + unfold F.read'.
+      repeat break_match_hyp; try discriminate.
+      erewrite IHe2; eauto.
+      simpl. find_rewrite; auto.
 Qed.
 
 Lemma nock_e_ok' :

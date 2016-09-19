@@ -46,9 +46,13 @@ Proof.
   - on (eval_e _ _ _ _), invc.
     do 2 find_copy_apply_hyp_hyp. ee.
   - on (eval_e _ _ _ _), invc.
-    find_copy_apply_hyp_hyp. ee.
+    + find_copy_apply_hyp_hyp. ee.
+    + find_copy_apply_hyp_hyp.
+      eapply eval_len_s; eauto.
   - on (eval_e _ _ _ _), invc.
-    find_copy_apply_hyp_hyp. ee.
+    + find_copy_apply_hyp_hyp. ee.
+    + find_copy_apply_hyp_hyp.
+      eapply eval_idx_s; eauto.
 Qed.
 
 Lemma transf_e_bwd :
@@ -87,30 +91,59 @@ Proof.
     + eapply transf_e_fwd; eauto.
   (* len and idx are copy paste *)
   - on (eval_e _ _ _ _), invc.
-    find_apply_hyp_hyp.
-    on (or _ _), invc; auto.
-    + left; ee.
-    + right; unfold not in *; intros.
-      on (eval_e _ _ _ _), inv. firstorder.
+    + find_apply_hyp_hyp.
+      on (or _ _), invc; auto.
+      * left; ee.
+      * right; unfold not in *; intros.
+        on (eval_e _ _ _ _), inv.
+        firstorder. firstorder.
+    + find_apply_hyp_hyp.
+      on (or _ _), invc; auto.
+      * left; eapply eval_len_s; eauto.
+      * right; unfold not in *; intros.
+        on (eval_e _ _ _ _), inv.
+        firstorder. firstorder.
   - right; unfold not in *; intros.
     on (eval_e _ _ _ _), inv.
-    eapply H0; eauto. ee.
-    eapply transf_e_fwd; eauto.
+    + eapply H0; eauto. ee.
+      eapply transf_e_fwd; eauto.
+    + eapply H0; eauto.
+      eapply eval_len_s; eauto.
+      eapply transf_e_fwd; eauto.
   - on (eval_e _ _ _ _), invc.
-    repeat find_apply_hyp_hyp.
-    repeat on (or _ _), invc; auto.
-    + left; ee.
-    + right; unfold not in *; intros.
-      on (eval_e _ _ _ _), inv. firstorder.
-    + right; unfold not in *; intros.
-      on (eval_e _ _ _ _), inv. firstorder.
-    + right; unfold not in *; intros.
-      on (eval_e _ _ _ _), inv. firstorder.
+    + repeat find_apply_hyp_hyp.
+      repeat on (or _ _), invc; auto.
+      * left; ee.
+      * right; unfold not in *; intros.
+        on (eval_e _ _ _ _), inv.
+        firstorder. firstorder.
+      * right; unfold not in *; intros.
+        on (eval_e _ _ _ _), inv.
+        firstorder. firstorder.
+      * right; unfold not in *; intros.
+        on (eval_e _ _ _ _), inv.
+        firstorder. firstorder.
+    + repeat find_apply_hyp_hyp.
+      repeat on (or _ _), invc; auto.
+      * left; eapply eval_idx_s; eauto.
+      * right; unfold not in *; intros.
+        on (eval_e _ _ _ _), inv.
+        firstorder. firstorder.
+      * right; unfold not in *; intros.
+        on (eval_e _ _ _ _), inv.
+        firstorder. firstorder.
+      * right; unfold not in *; intros.
+        on (eval_e _ _ _ _), inv.
+        firstorder. firstorder.
   - right; unfold not in *; intros.
     on (eval_e _ _ _ _), inv.
-    eapply H0; eauto. ee.
-    + eapply transf_e_fwd; eauto.
-    + eapply transf_e_fwd; eauto.
+    + eapply H0; eauto. ee.
+      * eapply transf_e_fwd; eauto.
+      * eapply transf_e_fwd; eauto.
+    + eapply H0; eauto.
+      eapply eval_idx_s; eauto.
+      * eapply transf_e_fwd; eauto.
+      * eapply transf_e_fwd; eauto.
 Qed.
 
 Lemma transfs_e_fwd :

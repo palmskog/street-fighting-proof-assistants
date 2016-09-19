@@ -43,6 +43,12 @@ function rand_int {
   expr $RANDOM % 100
 }
 
+function rand_str {
+	env LC_CTYPE=C \
+		tr -dc [:graph:] < /dev/urandom \
+      | head -c $(expr $RANDOM % 1000)
+}
+
 function get_input {
   case $1 in
     "fact-rec.imp")
@@ -57,14 +63,22 @@ function get_input {
     "fib-rec.imp")
       echo $(rand_int)
       ;;
+    "hello.imp")
+      ;;
     "inputs.imp")
       echo $(rand_int)
       echo $(rand_int)
       echo $(rand_bool)
       echo $(rand_bool)
       ;;
+    "ispalindrome.imp")
+      echo $(rand_str)
+      ;;
     "sort.imp")
       echo $(rand_int)
+      ;;
+    "srev.imp")
+      echo $(rand_str)
       ;;
     "swap.imp")
       echo $(rand_int)
@@ -76,7 +90,7 @@ function get_input {
     "minimal.imp")
       ;;
     *)
-      echo "ERROR: do not know how to set up input for $1"
+      echo "ERROR: do not know how to set up input for $1" >&2
       exit 1
       ;;
   esac

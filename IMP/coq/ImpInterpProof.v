@@ -66,9 +66,11 @@ Proof.
   - repeat break_match; try discriminate.
     ee. apply interp_op2_eval_op2; auto.
   - repeat break_match; try discriminate.
-    invc H. ee.
+    + find_inversion. eapply eval_len_s; eauto.
+    + find_inversion. eapply eval_len_a; eauto.
   - repeat break_match; try discriminate.
-    ee.
+    + find_inversion. eapply eval_idx_s; eauto.
+    + eapply eval_idx_a; eauto.
 Qed.
 
 Lemma eval_e_interp_e :
@@ -84,10 +86,16 @@ Proof.
   - break_match; try discriminate. find_inversion.
     break_match; try discriminate. find_inversion.
     reflexivity.
+  - break_match; try discriminate.
+    find_inversion. reflexivity.
+  - break_match; try discriminate.
+    find_inversion. repeat find_rewrite.
+    do 2 (break_match; try omega). auto.
   - break_match; try discriminate. find_inversion.
     break_match; try discriminate. find_inversion.
-    break_match; try discriminate. find_inversion.
-    do 2 (break_match; try omega). auto.
+    break_match; try omega.
+    break_match; try discriminate.
+    find_inversion; auto.
 Qed.
 
 Lemma interps_e_evals_e :

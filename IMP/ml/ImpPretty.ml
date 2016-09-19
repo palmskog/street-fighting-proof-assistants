@@ -3,9 +3,10 @@ open ImpSyntax
 open ImpCommon
 
 let val_pretty = function
-  | Vint i -> Big.to_string i
   | Vbool true -> "True"
   | Vbool false -> "False"
+  | Vint i -> Big.to_string i
+  | Vstr s -> mkstr "\"%s\"" (String.escaped (implode s))
   | Vaddr a -> mkstr "(Vaddr %s)" (Big.to_string a)
 
 let op1_pretty = function
@@ -177,6 +178,7 @@ let result_pretty = function
   | Done (h, v) ->
       begin match v with
       | Vaddr a -> array_pretty h a
+      | Vstr cs -> implode cs
       | v -> val_pretty v
       end
   | _ as r -> result_pretty' r

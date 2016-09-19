@@ -3,14 +3,12 @@
 open ZUtil
 open ImpSyntax
 
-let parse_error s =
-  failwith (mkstr "ImpParser: error on line %d" !line)
-
 %}
 
-%token <Big.big_int> INTLIT
 %token TRUE
 %token FALSE
+%token <Big.big_int> INTLIT
+%token <string> STRLIT
 
 %token LEN
 %token NOT
@@ -126,12 +124,14 @@ lstmt :
       { Swhile ($2, $4) }
 
 bexpr :
-  | INTLIT
-      { Eval (Vint $1) }
   | TRUE
       { Eval (Vbool true) }
   | FALSE
       { Eval (Vbool false) }
+  | INTLIT
+      { Eval (Vint $1) }
+  | STRLIT
+      { Eval (Vstr (explode $1)) }
   | ID
       { Evar (explode $1) }
   | LEN LPAREN expr RPAREN

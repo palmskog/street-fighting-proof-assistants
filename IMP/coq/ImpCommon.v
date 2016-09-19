@@ -20,8 +20,9 @@ Definition val_eq_dec :
     {v1 = v2} + {v1 <> v2}.
 Proof.
   decide equality.
-  - apply Z.eq_dec.
   - apply Bool.bool_dec.
+  - apply Z.eq_dec.
+  - apply String.string_dec.
   - apply Z.eq_dec.
 Defined.
 
@@ -138,7 +139,12 @@ Inductive extcall_spec :
     forall h i,
       extcall_spec
         "read_int" nil h
-        (Vint i) h.
+        (Vint i) h
+| read_str_spec :
+    forall h cs,
+      extcall_spec
+        "read_str" nil h
+        (Vstr cs) h.
 
 Definition extcall_args_ok
   (f : string) (vs : list val) (h : heap) : bool :=
@@ -146,6 +152,7 @@ Definition extcall_args_ok
   | "print_val", v :: nil => true
   | "read_bool", nil => true
   | "read_int", nil => true
+  | "read_str", nil => true
   | _, _ => false
   end.
 
