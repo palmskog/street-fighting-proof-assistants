@@ -2,8 +2,9 @@ open ImpSyntax
 open ZUtil
 
 let val_coq = function
-  | Vint i -> mkstr "(Vint %s)" (Big.to_string i)
   | Vbool b -> mkstr "(Vbool %s)" (string_of_bool b)
+  | Vint i  -> mkstr "(Vint %s)" (Big.to_string i)
+  | Vstr s  -> mkstr "(Vstr \"%s\")" (implode s)
   | Vaddr a -> mkstr "(Vaddr %s)" (Big.to_string a)
 
 let var_coq x =
