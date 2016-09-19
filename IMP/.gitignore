@@ -1,6 +1,7 @@
 _CoqProject
 Makefile.coq
 Imp.native
+Imp.p.native
 Imp.d.byte
 
 test/regression/*.imp.input

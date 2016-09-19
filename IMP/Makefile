@@ -4,6 +4,9 @@ OCB_FLAGS := -use-menhir -yaccflags --explain $(OCB_FLAGS)
 Imp.native: proof
 	ocamlbuild $(OCB_FLAGS) ml/Imp.native
 
+Imp.p.native: proof
+	ocamlbuild $(OCB_FLAGS) ml/Imp.p.native
+
 Imp.d.byte: proof
 	ocamlbuild $(OCB_FLAGS) ml/Imp.d.byte
 
