@@ -87,6 +87,9 @@ function get_input {
     "sum.imp")
       echo $(rand_int)
       ;;
+    "partition.imp")
+      echo $(rand_int)
+      ;;
     "minimal.imp")
       ;;
     *)
