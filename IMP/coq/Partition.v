@@ -665,28 +665,16 @@ Proof.
       repeat find_rewrite.
       unfold imp_lt in *. find_apply_lem_hyp pred_of_dec_true_elim.
 
-      on (eval_e _ _ _ _), fun H => eapply eval_e_idx_a_inv in H;
-      try match goal with
-      | [  |- eval_e _ _ (Evar _) _ ] => 
-        eapply eval_var
-      end; 
-      try rewrite lkup_update_neq by discriminate; eauto.
-
-      on (eval_e _ _ _ _), fun H => eapply eval_e_idx_a_inv in H;
-      try match goal with
-      | [  |- eval_e _ _ (Evar _) _ ] => 
-        eapply eval_var
-      end; 
-      try rewrite lkup_update_neq by discriminate; eauto.
-
-      match goal with
+      repeat (match goal with
       | [ H : eval_e _ _ (Eidx ?a ?b) _ |- _ ] => 
         eapply eval_e_idx_a_inv with (e1 := a) (e2 := b) in H
       end;
       try match goal with
       | [  |- eval_e _ _ (Evar _) _ ] => eapply eval_var
       end; 
-      try rewrite lkup_update_neq by discriminate; eauto.
+      try rewrite lkup_update_neq by discriminate;
+      eauto using eval_op2, eval_var, eval_val, eval_sub).
+
 
       normalize_Z.
 
