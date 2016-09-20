@@ -230,7 +230,11 @@ Lemma read_write_same :
     write h a x = Some h' ->
     read h' a = Some x.
 Proof.
-Admitted.
+  induction h; simpl; intros.
+  - discriminate.
+  - repeat break_match; repeat find_inversion; auto; try congruence.
+    all: cbn [read]; auto.
+Qed.
 
 Lemma read_write_neq :
   forall h h' a b x,
@@ -238,13 +242,26 @@ Lemma read_write_neq :
     a <> b ->
     read h' b = read h b.
 Proof.
-Admitted.
+  induction h; simpl; intros.
+  - discriminate.
+  - repeat break_match; repeat find_inversion; try congruence.
+    all: cbn[read]; eauto.
+    all: eapply IHh; eauto; omega.
+Qed.
 
 Lemma read_write_nop :
   forall h a x,
     read h a = Some x ->
     write h a x = Some h.
-Admitted.
+Proof.
+  induction h; simpl; intros.
+  - discriminate.
+  - destruct a0.
+    + solve_by_inversion.
+    + rewrite IHh; auto.
+    + rewrite IHh; auto.
+Qed.
+
 
 Lemma array_at'_extend_r :
   forall l h a i x,
@@ -252,14 +269,31 @@ Lemma array_at'_extend_r :
     read h i = Some (Vint x) ->
     i = a + Zlength l ->
     array_at' a (l ++ [x]) h.
-Admitted.
+Proof.
+  induction l; intros.
+  - rewrite Zlength_correct in *.
+    simpl in *.
+    intuition.
+    assert (i = a) by omega.
+    subst a.
+    auto.
+  - rewrite Zlength_correct in *.
+    simpl in *. intuition.
+    eapply IHl; eauto.
+    zify. omega.
+Qed.
+
 
 Lemma array_at'_extend_l :
   forall l h a x,
     array_at' (a + 1) l h ->
     read h a = Some (Vint x) ->
     array_at' a (x :: l) h.
-Admitted.
+Proof.
+  intros.
+  simpl.
+  intuition.
+Qed.
 
 Lemma array_at'_write_preserve :
   forall l h h' a i x,
@@ -267,7 +301,18 @@ Lemma array_at'_write_preserve :
     write h i x = Some h' ->
     ~ a <= i < a + Zlength l ->
     array_at' a l h'.
-Admitted.
+Proof.
+  induction l; intros.
+  - simpl. auto.
+  - cbn [array_at'] in *. break_and.
+    rewrite Zlength_correct in *.
+    cbn [Datatypes.length] in *.
+    split.
+    + erewrite read_write_neq; eauto.
+      zify. omega.
+    + eapply IHl; eauto.
+      zify. omega.
+Qed.
 
 Lemma array_at'_write_extend_r :
   forall l h h' a i x,
@@ -389,7 +434,16 @@ Lemma array_at'_app :
     a2 = a1 + Zlength l1 ->
     array_at' a1 (l1 ++ l2) h.
 Proof.
-Admitted.
+  induction l1; simpl; intuition.
+  - rewrite Zlength_nil in *.
+    assert (a2 = a1) by omega.
+    subst a1.
+    auto.
+  - rewrite Zlength_correct in *.
+    cbn [Datatypes.length] in *.
+    eapply IHl1; eauto.
+    zify. omega.
+Qed.
 
 Lemma rotate_right_permutation :
   forall A (l : list A), Permutation l (rotate_right l).
