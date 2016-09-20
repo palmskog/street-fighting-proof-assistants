@@ -116,14 +116,14 @@ Qed.
 
 Ltac break_eval_expr :=
   repeat match goal with
-  | [ H : eval_unop _ _ ?x |- _ ] => remember x; invc H
-  | [ H : eval_binop _ _ _ ?x |- _ ] => remember x; invc H
-  | [ H : eval_e _ _ (Eval _) ?x |- _ ] => remember x; invc H
-  | [ H : eval_e _ _ (Evar _) ?x |- _ ] => remember x; invc H
-  | [ H : eval_e _ _ (Eop1 _ _) ?x |- _ ] => remember x; invc H
-  | [ H : eval_e _ _ (Eop2 _ _ _) ?x |- _ ] => remember x; invc H
-  | [ H : eval_e _ _ (Eidx _ _) ?x |- _ ] => remember x; invc H
-  | [ H : eval_e _ _ (Elen _) ?x |- _ ] => remember x; invc H
+  | [ H : eval_unop _ _ ?x |- _ ] => remember x; invc H; [idtac]
+  | [ H : eval_binop ?op _ _ ?x |- _ ] => remember x; invc H; [idtac]
+  | [ H : eval_e _ _ (Eval _) ?x |- _ ] => remember x; invc H; [idtac]
+  | [ H : eval_e _ _ (Evar _) ?x |- _ ] => remember x; invc H; [idtac]
+  | [ H : eval_e _ _ (Eop1 _ _) ?x |- _ ] => remember x; invc H; [idtac]
+  | [ H : eval_e _ _ (Eop2 _ _ _) ?x |- _ ] => remember x; invc H; [idtac]
+  | [ H : eval_e _ _ (Eidx _ _) ?x |- _ ] => remember x; invc H; [idtac]
+  | [ H : eval_e _ _ (Elen _) ?x |- _ ] => remember x; invc H; [idtac]
   end.
 
 Ltac step_forward :=

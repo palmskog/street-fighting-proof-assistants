@@ -15,6 +15,7 @@ Require Import ImpInterpNock.
 Require Import ImpInterpProof.
 Require Import ImpInterpNockProof.
 Require Import ImpVerif.
+Require Import ImpSemanticsFacts.
 
 Import ListNotations.
 
@@ -80,14 +81,13 @@ Proof.
   - (* loop invariant /\ false -> postcondition *)
     break_and. break_exists_name i_val; break_exists_name acc; break_and.
     break_eval_expr.
-    + repeat find_rewrite.
-      repeat find_injection.
-      unfold imp_lt, pred_of_dec in *. break_if; try discriminate.
-      assert (i2 = Zlength contents) by congruence. subst.
-      assert (i1 = Zlength contents) by omega. subst.
-      rewrite Zlength_correct, Nat2Z.id, skipn_none in *.
-      auto using f_equal.
-    + congruence.
+    find_eapply_lem_hyp eval_e_len_a_inv; eauto using eval_var.
+    repeat find_rewrite.
+    repeat find_injection.
+    unfold imp_lt, pred_of_dec in *. break_if; try discriminate.
+    assert (i1 = Zlength contents) by omega. subst.
+    rewrite Zlength_correct, Nat2Z.id, skipn_none in *.
+    auto using f_equal.
   - (* precondition -> loop invariant *)
     split; auto.
     exists 0, 0.
@@ -101,19 +101,27 @@ Proof.
     end.
     intros.
     break_and. subst.
-    repeat (step_forward; break_eval_expr;
-      try congruence).
+    break_exists. break_and.
+    break_eval_expr.
+    find_eapply_lem_hyp eval_e_len_a_inv; eauto using eval_var.
+    step_forward.
+    step_forward.
+    break_eval_expr.
+    step_forward.
+    break_eval_expr.
+    find_eapply_lem_hyp eval_e_idx_a_inv; eauto using eval_var.
+    repeat find_rewrite.
+    repeat find_injection.
+    break_eval_expr.
     split; auto.
-    break_exists_name i_val. break_exists_name acc. break_and.
     rewrite !lkup_update_neq in * by discriminate.
     rewrite !lkup_update_same in *.
     repeat find_rewrite.
     repeat find_injection.
-    exists (i + 1), (i4 + i5).
+    exists (i0 + 1), (acc + i3).
     intuition.
     + unfold imp_lt in *.
       find_apply_lem_hyp pred_of_dec_true_elim.
-      assert (i2 = Zlength contents) by congruence. subst.
       omega.
     + rewrite !lkup_update_neq in * by discriminate.
       rewrite !lkup_update_same in *.
@@ -121,16 +129,7 @@ Proof.
     + rewrite Z.add_1_r.
       rewrite Z2Nat.inj_succ by auto.
       unfold imp_lt, pred_of_dec in *. break_if; try discriminate.
-      assert (i2 = Zlength contents) by congruence. subst.
       find_eapply_lem_hyp  array_at_read_nth_error; eauto.
       erewrite skipn_nth_error_unroll in * by eauto.
       cbn [sum_Zlist] in *. auto.
-
-  (* leftover from string stuff *)
-  + find_inversion.
-  find_inversion.
-  unfold array_at in Harr.
-  repeat find_rewrite.
-  break_and.
-  (* FALSE by H17 *)
-Admitted.
+Qed.

@@ -14,7 +14,9 @@ Require Import ImpInterp.
 Require Import ImpInterpNock.
 Require Import ImpInterpProof.
 Require Import ImpInterpNockProof.
+Require Import ImpSemanticsFacts.
 Require Import ImpVerif.
+
 
 Import ListNotations.
 
@@ -489,11 +491,14 @@ Lemma partition_spec :
 Proof.
   intros env s h s' h' a_val pivot_val contents Ha Hpiv Harr Heval.
   unfold partition in *.
-  repeat step_forward; break_eval_expr.
-  rewrite lkup_update_neq in * by discriminate.
-  assert (a_val = a) by congruence. subst a.
-  copy_apply array_at_read_length Harr.
-  assert (l = Zlength contents) by congruence. subst l.
+  repeat (step_forward; break_eval_expr).
+  find_copy_apply_lem_hyp array_at_read_length.
+
+  on (eval_e _ _ _ _), (fun H => eapply eval_e_len_a_inv in H).
+  3: eauto.
+  2: apply eval_var;
+     rewrite lkup_update_neq by discriminate; auto.
+  
   eapply eval_stmt_while_elim
   with (I := fun s h =>
     exists i_val l_val h_val los eqs his rest,
@@ -517,15 +522,13 @@ Proof.
     find_apply_lem_hyp pred_of_dec_false_elim.
     repeat find_rewrite.
     repeat find_injection.
-(* can't find los *)
-(*
     assert (Zlength los + Zlength eqs + Zlength rest + Zlength his = Zlength contents).
     { destruct (partition_list'_sufficient_fuel pivot_val rest los eqs his) as [[[? ?] ?] ?].
       destruct (partition_list'_sufficient_fuel pivot_val contents [] [] []) as [[[? ?] ?] ?].
       repeat find_rewrite.
       find_inversion.
       repeat find_apply_lem_hyp partition_list'_length.
-      cbn [length] in *.
+      cbn [Datatypes.length] in *.
       rewrite !Zlength_correct.
       zify. omega. }
     assert (Zlength rest = 0).
@@ -534,7 +537,7 @@ Proof.
     repeat find_rewrite.
     find_apply_lem_hyp Zlength_nil_inv.
     subst.
-    cbn [length] in *.
+    cbn [Datatypes.length] in *.
     rewrite partition_list'_unroll with (fuel := 0%nat) in *.
     exists (rev los), (rev eqs), his.
     split; [|split].
@@ -548,17 +551,18 @@ Proof.
         rewrite !Zlength_correct, rev_length in *. auto.
         eauto.
         rewrite !Zlength_correct, !rev_length in *. zify. omega.
-    + pose proof partition_list'_permutation _ _ _ _ _ _ _ _ _ (eq_sym H17).
+    + pose proof partition_list'_permutation _ _ _ _ _ _ _ _ _ (eq_sym H16).
       rewrite app_nil_r in *.
       eapply Permutation_trans. eauto.
       auto using Permutation_app, Permutation_rev.
-    + pose proof partition_list'_correct _ _ _ _ _ _ _ _ _ (eq_sym H17).
+    + pose proof partition_list'_correct _ _ _ _ _ _ _ _ _ (eq_sym H16).
       repeat conclude_using ltac:(simpl; intuition).
       intuition auto using in_rev'.
   - (* precondition -> loop invariant *)
     clear H3.
     exists 0, 0, (Zlength contents), [], [], [], contents.
     repeat rewrite ?lkup_update_same, ?lkup_update_neq by discriminate.
+    subst.
     intuition.
     + now compute.
     + now compute.
@@ -583,7 +587,7 @@ Proof.
       repeat find_rewrite.
       find_inversion.
       repeat find_apply_lem_hyp partition_list'_length.
-      cbn [length] in *.
+      cbn [Datatypes.length] in *.
       rewrite !Zlength_correct.
       zify. omega. }
 
@@ -595,6 +599,7 @@ Proof.
     rewrite Zlength_cons in *.
     rewrite partition_list'_unroll in * |-.
     repeat (step_forward; break_eval_expr).
+
     + (* a[i] < pivot *)
       repeat rewrite ? lkup_update_same, ? lkup_update_neq in * by discriminate.
       repeat find_rewrite.
@@ -603,12 +608,40 @@ Proof.
       repeat find_injection.
       normalize_Z.
 
-      match goal with
-      | [ H : read ?h ?i = Some (Vint ?x), H' : read ?h ?j = Some (Vint ?y) |- _ ] =>
-        assert (x = y) by congruence; subst
-      end.
       repeat find_rewrite.
       unfold imp_lt in *. find_apply_lem_hyp pred_of_dec_true_elim.
+
+      on (eval_e _ _ _ _), fun H => eapply eval_e_idx_a_inv in H;
+      try match goal with
+      | [  |- eval_e _ _ (Evar _) _ ] => 
+        eapply eval_var
+      end; 
+      try rewrite lkup_update_neq by discriminate; eauto.
+
+      on (eval_e _ _ _ _), fun H => eapply eval_e_idx_a_inv in H;
+      try match goal with
+      | [  |- eval_e _ _ (Evar _) _ ] => 
+        eapply eval_var
+      end; 
+      try rewrite lkup_update_neq by discriminate; eauto.
+
+      match goal with
+      | [ H : eval_e _ _ (Eidx ?a ?b) _ |- _ ] => 
+        eapply eval_e_idx_a_inv with (e1 := a) (e2 := b) in H
+      end;
+      try match goal with
+      | [  |- eval_e _ _ (Evar _) _ ] => eapply eval_var
+      end; 
+      try rewrite lkup_update_neq by discriminate; eauto.
+
+      normalize_Z.
+
+      repeat match goal with
+      | [ H : read ?h ?i = Some ?x, H' : read ?h ?i = Some ?y |- _ ] =>
+        assert (x = y) by congruence; subst; clear H
+      end.
+      find_injection.
+
       break_if; [| now rewrite Z.ltb_nlt in *].
       do 3 eexists. exists (i1 :: los), (rotate_right eqs), his, rest; intuition.
       * erewrite read_write_neq; [|eauto|].
@@ -642,7 +675,7 @@ Proof.
            match goal with
            | [ H : array_at' _ (_ :: _) _ |- _ ] => cbn [array_at'] in H; destruct H
            end.
-           eapply array_at'_write_extend_r; [| |eauto].
+           eapply array_at'_write_extend_r; [| |solve [eauto]].
            eapply array_at'_write_preserve.
            eapply eq_rect with (P := fun x => _ x _ _).
            all: eauto.
@@ -651,8 +684,7 @@ Proof.
            eapply eq_rect with (P := fun x => _ x _ = _).
            eapply eq_rect with (P := fun x => _ x = _).
            eauto.
-
-           assert (Z.succ (a3 + Zlength los) = a3 + 1 + Zlength los) by omega.
+           normalize_Z.
            congruence.
            rewrite !Zlength_correct, app_length, rev_length. simpl. zify. omega.
       * rewrite !Zlength_correct, rotate_right_length. omega.
@@ -676,14 +708,28 @@ Proof.
       repeat find_rewrite.
       repeat find_injection.
 
+      repeat (match goal with
+      | [ H : eval_e _ _ (Eidx ?a ?b) _ |- _ ] => 
+        eapply eval_e_idx_a_inv with (e1 := a) (e2 := b) in H
+      end;
+      try match goal with
+      | [  |- eval_e _ _ (Evar _) _ ] => eapply eval_var
+      end; 
+      try rewrite lkup_update_neq by discriminate; eauto; [idtac]).
+
+      repeat match goal with
+      | [ H : read ?h ?i = Some ?x, H' : read ?h ?i = Some ?y |- _ ] =>
+        assert (x = y) by congruence; subst; clear H
+      end.
+
       normalize_Z.
 
       unfold imp_eq in *.
       find_apply_lem_hyp pred_of_dec_true_elim.
       find_injection.
+      normalize_Z.
       assert (z = i2) by congruence. subst z.
-      break_if.
-      rewrite Z.ltb_lt in *. omega.
+      break_if; [ rewrite Z.ltb_lt in *; omega |].
       break_if; [| rewrite Z.eqb_neq in *; congruence].
       do 3 eexists. exists los, (i2 :: eqs), his, rest.
       intuition eauto; normalize_Z; auto.
@@ -696,12 +742,31 @@ Proof.
       repeat find_rewrite.
       repeat find_injection.
       normalize_Z.
+      
+
+      repeat (match goal with
+      | [ H : eval_e _ _ (Eidx ?a ?b) _ |- _ ] => 
+        eapply eval_e_idx_a_inv with (e1 := a) (e2 := b) in H
+      end;
+      try match goal with
+      | [  |- eval_e _ _ (Evar _) _ ] => eapply eval_var
+      end; 
+      try rewrite lkup_update_neq by discriminate; 
+      eauto using eval_op2, eval_var, eval_val, eval_sub).
+      
+      normalize_Z.
+
+
+      repeat match goal with
+      | [ H : read ?h ?i = Some ?x, H' : read ?h ?i = Some ?y |- _ ] =>
+        assert (x = y) by congruence; subst; clear H
+      end.
+
+      find_injection.
+
       repeat find_apply_lem_hyp pred_of_dec_false_elim.
-      assert (z = i1) by congruence. subst z.
-      break_if.
-      rewrite Z.ltb_lt in *; congruence.
-      break_if.
-      rewrite Z.eqb_eq in *. congruence.
+      break_if; [rewrite Z.ltb_lt in *; congruence |].
+      break_if; [rewrite Z.eqb_eq in *; congruence |].
       do 3 eexists. exists los, eqs, (i1 :: his), (rotate_right rest).
       intuition eauto; normalize_Z.
       * erewrite read_write_neq; [|eauto|].
@@ -736,10 +801,15 @@ Proof.
 
 
            pose proof fun H => array_at'_read_nth _ _ _ (Zlength l) 0 H11 H.
-           rewrite !Zlength_correct in *. cbn[length] in *. conclude_using ltac:(zify; omega).
+           rewrite !Zlength_correct in *. cbn[Datatypes.length] in *. 
+           conclude_using ltac:(zify; omega).
+           
            assert
-             (a4 + Z.of_nat (length los) + Z.of_nat (length eqs) + 2 + Z.of_nat (length l) =
-              a4 + Z.of_nat (length contents) - Z.of_nat (length his)) by (zify; omega).
+             (a0 + Z.of_nat (Datatypes.length los) + Z.of_nat (Datatypes.length eqs) + 2 + 
+                  Z.of_nat (Datatypes.length l) =
+              a0 + Z.of_nat (Datatypes.length contents) - Z.of_nat (Datatypes.length his)) 
+             by (zify; omega).
+
            repeat find_rewrite.
            remember (z :: l) in *.
            find_injection.
@@ -748,7 +818,7 @@ Proof.
             auto using f_equal, nth_last.
       * destruct rest as [|z rest].
         -- rewrite Zlength_nil in *.
-           assert (a4 + Zlength los + Zlength eqs + 1 = a4 + Zlength contents - Zlength his)
+           assert (a0 + Zlength los + Zlength eqs + 1 = a0 + Zlength contents - Zlength his)
              by omega.
            repeat find_rewrite.
            repeat find_injection.
@@ -760,9 +830,7 @@ Proof.
         -- eapply array_at'_write_preserve.
            eapply array_at'_write_extend_l.
            all: eauto.
-           rewrite !Zlength_correct in *. cbn [length] in *. zify. omega.
-      * rewrite !Zlength_correct in *. cbn [length] in *. zify. omega.
-      * cbn [length] in *. rewrite rotate_right_length. auto.
+           rewrite !Zlength_correct in *. cbn [Datatypes.length] in *. zify. omega.
+      * rewrite !Zlength_correct in *. cbn [Datatypes.length] in *. zify. omega.
+      * cbn [Datatypes.length] in *. rewrite rotate_right_length. auto.
 Qed.
-*)
-Admitted.

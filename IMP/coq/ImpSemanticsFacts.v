@@ -64,6 +64,36 @@ Proof.
   - find_eapply_lem_hyp eval_binop_det; eauto.
 Qed.
 
+Lemma eval_e_len_a_inv :
+  forall s h e x a l,
+    eval_e s h (Elen e) x ->
+    eval_e s h e (Vaddr a) ->
+    read h a = Some (Vint l) ->
+    x = Vint l.
+Proof.
+  intros.
+  invc H.
+  - eapply ImpSemanticsFacts.eval_e_det in H0; eauto. congruence.
+  - eapply ImpSemanticsFacts.eval_e_det in H0; eauto. congruence.
+Qed.
+
+Lemma eval_e_idx_a_inv :
+  forall s h e1 e2 x a i l,
+    eval_e s h (Eidx e1 e2) x ->
+    eval_e s h e1 (Vaddr a) ->
+    eval_e s h e2 (Vint i) ->
+    read h a = Some (Vint l) ->
+    read h (Z.succ (a + i)) = Some x.
+Proof.
+  intros.
+  invc H.
+  - eapply ImpSemanticsFacts.eval_e_det in H0; eauto.
+    eapply ImpSemanticsFacts.eval_e_det in H1; eauto.
+    congruence.
+  - eapply ImpSemanticsFacts.eval_e_det in H0; eauto.
+    congruence.
+Qed.
+
 (** step facts *)
 
 Lemma nostep_nop :
