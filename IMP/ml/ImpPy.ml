@@ -135,7 +135,7 @@ let results_match ir (res, err, ret) =
   | Unix.WEXITED 0 ->
       let ir_str =
         ir |> ImpPretty.result_pretty
-           |> flip List.cons !ImpLib.outputs
+           |> (fun x -> x :: !ImpLib.outputs)
            |> List.rev
            |> String.concat "\n"
            (*
