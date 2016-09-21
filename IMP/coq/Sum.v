@@ -63,6 +63,7 @@ Lemma sum_spec :
     lkup s "a" = Some (Vaddr a_val) ->
     array_at a_val contents h ->
     eval_s env s h sum_body s' h' ->
+    h = h' /\
     lkup s' "result" = Some (Vint (sum_Zlist 0 contents)).
 Proof.
   intros env s h s' h' a_val contents Ha Harr Heval.
