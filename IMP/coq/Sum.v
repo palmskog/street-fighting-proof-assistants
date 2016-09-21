@@ -79,9 +79,8 @@ Proof.
       sum_Zlist acc (skipn (Z.to_nat i_val) contents) = sum_Zlist 0 contents)
     in H7.
   - (* loop invariant /\ false -> postcondition *)
-    break_and. break_exists_name i_val; break_exists_name acc; break_and.
+    break_and. break_exists. break_and.
     break_eval_expr.
-    find_eapply_lem_hyp eval_e_len_a_inv; eauto using eval_var.
     repeat find_rewrite.
     repeat find_injection.
     unfold imp_lt, pred_of_dec in *. break_if; try discriminate.
@@ -103,13 +102,11 @@ Proof.
     break_and. subst.
     break_exists. break_and.
     break_eval_expr.
-    find_eapply_lem_hyp eval_e_len_a_inv; eauto using eval_var.
     step_forward.
     step_forward.
     break_eval_expr.
     step_forward.
     break_eval_expr.
-    find_eapply_lem_hyp eval_e_idx_a_inv; eauto using eval_var.
     repeat find_rewrite.
     repeat find_injection.
     break_eval_expr.
