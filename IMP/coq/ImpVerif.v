@@ -10,6 +10,7 @@ Require Import StructTactics.
 Require Import ImpSyntax.
 Require Import ImpCommon.
 Require Import ImpEval.
+Require Import ImpSemanticsFacts.
 
 Import ListNotations.
 
@@ -114,6 +115,22 @@ Proof.
   rewrite <- H1. f_equal. omega.
 Qed.
 
+Lemma array_at_read_length :
+  forall a contents h,
+    array_at a contents h ->
+    read h a = Some (Vint (Zlength contents)).
+Proof.
+  unfold array_at.
+  intros.
+  break_match; intuition.
+  congruence.
+Qed.
+
+
+Hint Constructors eval_e.
+Hint Constructors eval_binop.
+Hint Extern 3 (lkup (update _ _ _) _ = _) => rewrite lkup_update_neq by discriminate.
+
 Ltac break_eval_expr :=
   repeat match goal with
   | [ H : eval_unop _ _ ?x |- _ ] => remember x; invc H; [idtac]
@@ -123,7 +140,11 @@ Ltac break_eval_expr :=
   | [ H : eval_e _ _ (Eop1 _ _) ?x |- _ ] => remember x; invc H; [idtac]
   | [ H : eval_e _ _ (Eop2 _ _ _) ?x |- _ ] => remember x; invc H; [idtac]
   | [ H : eval_e _ _ (Eidx _ _) ?x |- _ ] => remember x; invc H; [idtac]
+  | [ H : eval_e _ _ (Eidx ?a ?b) _ |- _ ] =>
+    eapply eval_e_idx_a_inv with (e1 := a) (e2 := b) in H; eauto; [idtac]
   | [ H : eval_e _ _ (Elen _) ?x |- _ ] => remember x; invc H; [idtac]
+  | [ H : eval_e _ _ (Elen _) ?x |- _ ] =>
+    eapply eval_e_len_a_inv in H; eauto using array_at_read_length; [idtac]
   end.
 
 Ltac step_forward :=
@@ -148,13 +169,3 @@ Proof.
   break_if; congruence.
 Qed.
 
-Lemma array_at_read_length :
-  forall a contents h,
-    array_at a contents h ->
-    read h a = Some (Vint (Zlength contents)).
-Proof.
-  unfold array_at.
-  intros.
-  break_match; intuition.
-  congruence.
-Qed.
