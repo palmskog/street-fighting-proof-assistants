@@ -131,3 +131,103 @@ Proof.
       erewrite skipn_nth_error_unroll in * by eauto.
       cbn [sum_Zlist] in *. auto.
 Qed.
+
+Lemma sum_total_spec :
+  forall env s h a_val contents,
+    lkup s "a" = Some (Vaddr a_val) ->
+    array_at a_val contents h ->
+    after env s h sum_body (fun s' h' =>
+      h' = h /\
+      lkup s' "result" = Some (Vint (sum_Zlist 0 contents))).
+Proof.
+  intros.
+  unfold sum_body.
+
+  apply after_seq.
+  eapply after_set; eauto.
+
+  apply after_seq.
+  eapply after_set; eauto.
+
+  apply after_while
+  with (I := fun s0 h0 =>
+             h0 = h /\
+             lkup s0 "a" = Some (Vaddr a_val) /\
+             exists i_val acc,
+               lkup s0 "i" = Some (Vint i_val) /\
+               0 <= i_val <= Zlength contents /\
+               lkup s0 "result" = Some (Vint acc) /\
+               sum_Zlist acc (skipn (Z.to_nat i_val) contents) = sum_Zlist 0 contents)
+       (f := fun s0 =>
+             match lkup s0 "i" with
+             | Some (Vint i) =>
+               Z.to_nat (Zlength contents - i)
+             | _ => 0%nat
+             end).
+  - (* I -> condition safety *)
+    intuition.
+    break_exists. break_and.
+    subst.
+    eauto 10 using array_at_read_length.
+  - (* precondition *)
+    intuition.
+    exists 0, 0.
+    rewrite !lkup_update_neq by discriminate.
+    rewrite !lkup_update_same.
+    intuition.
+    rewrite Zlength_correct.
+    zify. omega.
+  - (* body obligation *)
+    intuition. subst.
+    break_exists.
+    break_and.
+    break_eval_expr.
+    repeat find_rewrite.
+    repeat find_injection.
+    unfold imp_lt in *.
+    find_eapply_lem_hyp pred_of_dec_true_elim.
+    apply after_seq.
+    eapply after_set.
+    eauto 10 using array_at_read_length, array_at_read_nth with *.
+
+    eapply after_set.
+    eauto.
+
+    rewrite !lkup_update_neq by discriminate.
+    rewrite !lkup_update_same.
+    rewrite !lkup_update_neq by discriminate.
+    rewrite !lkup_update_same.
+    intuition.
+    + do 2 eexists.
+      intuition eauto.
+      omega.
+      omega.
+      erewrite skipn_nth_error_unroll with (a := nth (Z.to_nat i1) contents 0) in *|-.
+      * cbn [sum_Zlist] in *.
+        etransitivity; [|eauto].
+        f_equal.
+        f_equal.
+        zify. rewrite !Z2Nat.id by omega. omega.
+      * apply nth_nth_error.
+        rewrite Zlength_correct in *.
+        zify.
+        rewrite Z2Nat.id in * by auto.
+        omega.
+    + rewrite Zlength_correct in *.
+      zify. rewrite !Z2Nat.id in * by omega. omega.
+- (* postcondition *)
+  intuition.
+  break_exists. break_and. subst.
+  break_eval_expr.
+  repeat find_rewrite.
+  repeat find_injection.
+  unfold imp_lt in *.
+  find_apply_lem_hyp pred_of_dec_false_elim.
+  assert (i1 = Zlength contents) by omega.
+  subst.
+  rewrite Zlength_correct in *.
+  rewrite Nat2Z.id in *.
+  rewrite skipn_none in *.
+  cbn [sum_Zlist] in *.
+  congruence.
+Qed.
