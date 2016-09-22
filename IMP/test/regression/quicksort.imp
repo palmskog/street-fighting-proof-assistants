@@ -24,7 +24,7 @@ def quicksort(a, lo, hi) {
     if (1 < hi - lo) {
       mid = partition(a, a[lo], lo, hi);
       _ = quicksort(a, lo, mid);
-      _ = quicksort(a, hi, mid);
+      _ = quicksort(a, mid, hi);
     }
     return a;
 }
