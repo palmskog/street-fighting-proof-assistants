@@ -126,10 +126,20 @@ Inductive extcall_spec :
   string -> list val -> heap ->
   val -> heap -> Prop :=
 | print_spec :
-    forall v h,
+    forall v h v',
       extcall_spec
         "print_val" (v :: nil) h
-        (Vint 0) h
+        v' h
+| flush_spec :
+    forall h v',
+      extcall_spec
+        "flush" nil h
+        v' h
+| sleep_spec :
+    forall i h v',
+      extcall_spec
+        "sleep" (Vint i :: nil) h
+        v' h
 | read_bool_spec :
     forall h b,
       extcall_spec
@@ -150,6 +160,8 @@ Definition extcall_args_ok
   (f : string) (vs : list val) (h : heap) : bool :=
   match f, vs with
   | "print_val", v :: nil => true
+  | "flush", nil => true
+  | "sleep", Vint i :: nil => true
   | "read_bool", nil => true
   | "read_int", nil => true
   | "read_str", nil => true

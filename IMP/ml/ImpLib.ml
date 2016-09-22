@@ -19,13 +19,19 @@ let outputs : (string list) ref =
 let output h v =
   let s = !pretty h v in
   outputs := s :: !outputs;
-  print_endline s;
-  flush stdout
+  print_endline s
 
 let extcall name args h =
   match implode name, args with
   | "print_val", [v] ->
       output h v;
+      (Vint Big.zero, h)
+  | "flush", [] ->
+      flush stdout;
+      (Vint Big.zero, h)
+  | "sleep", [Vint i] ->
+      let ms = (Big_int.float_of_big_int i) /. 1000.0 in
+      ignore (Unix.select [] [] [] ms);
       (Vint Big.zero, h)
   | "read_bool", [] ->
       begin match input () with
