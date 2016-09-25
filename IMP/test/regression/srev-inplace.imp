@@ -1,0 +1,19 @@
+def swap(a, i, j) {
+  tmp = a[i];
+  a[i] = a[j];
+  a[j] = tmp;
+}
+
+def reverse(a) {
+  i = 0;
+  while (i <= a.length - 1 - i) {
+    swap(a, i, a.length - 1 - i);
+    i = i + 1;
+  }
+}
+
+a = read_str();
+
+result = reverse(a);
+
+return result;
